@@ -201,6 +201,9 @@ static int handle_new_process_common(
         abort();
     }
     cmdline[cmdline_len-1] = 0;
+    /* KVM */
+    usleep(2 * 1000 * 1000);
+    /* /KVM */
     data_vchan = libvchan_client_init(connect_domain, connect_port);
     if (!data_vchan) {
         LOG(ERROR, "Data vchan connection failed");
