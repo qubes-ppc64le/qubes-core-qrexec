@@ -287,7 +287,10 @@ void init(int xid)
                     exit(0);
                 if (!opt_quiet)
                     LOG(ERROR, "Waiting for VM's qrexec agent.");
-                for (i=0;i<startup_timeout;i++) {
+                //// KVM:  TEST
+                //for (i=0;i<startup_timeout;i++) {
+                for (i=0;i<120;i++) {
+                ////////
                     sleep(1);
                     if (!opt_quiet)
                         fprintf(stderr, ".");
@@ -328,11 +331,32 @@ void init(int xid)
         }
     }
 
+    ////////////////////////////////////////////////////////////////////////////
+    /* KVM:  TEMP TEST:
     vchan = libvchan_client_init(xid, VCHAN_BASE_PORT);
     if (!vchan) {
         PERROR("cannot connect to qrexec agent");
         exit(1);
     }
+    */
+    vchan = libvchan_client_init(xid, VCHAN_BASE_PORT);
+    if (!vchan) {
+        //for (i=0;i<startup_timeout;i++) {
+        for (i=0;i<180;i++) {
+            sleep(1);
+            vchan = libvchan_client_init(xid, VCHAN_BASE_PORT);
+            if (vchan) {
+                break;
+            }
+            //if (!opt_quiet)
+            //    fprintf(stderr, ".");
+            if (i==startup_timeout-1) {
+                PERROR("cannot connect to qrexec agent");
+                exit(1);
+            }
+        }
+    }
+    ////////////////////////////////////////////////////////////////////////////
 
     protocol_version = handle_agent_hello(vchan, remote_domain_name);
     if (protocol_version < 0) {
